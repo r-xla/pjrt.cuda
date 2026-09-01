@@ -1,0 +1,25 @@
+Package: pjrt.cuda
+Title: CUDA Toolkit Libraries for 'pjrt'
+Version: 0.1.0
+Authors@R: c(
+    person("Sebastian", "Fischer", , "seb.fischer@tutamail.com", role = c("cre", "aut"),
+           comment = c(ORCID = "https://orcid.org/0000-0002-9609-3197")),
+    person("Daniel", "Falbel", , "daniel@posit.co", role = "aut",
+           comment = c(ORCID = "https://orcid.org/0009-0006-0143-2392")))
+Description: Provides the CUDA 13.3 native libraries required by the CUDA
+    PJRT plugin used by the 'pjrt' package (CUDA runtime, cuBLAS, cuDNN,
+    CUPTI, NVRTC, cuFFT, cuSPARSE, NvJitLink, NCCL, and NVCC) by
+    downloading pre-built binaries from PyPI at install time. The
+    source package is lightweight; all CUDA components are fetched during
+    installation.
+SystemRequirements: Linux on x86_64 or aarch64; an NVIDIA GPU driver at
+    runtime.
+License: MIT + file LICENSE
+URL: https://github.com/r-xla/pjrt.cuda
+BugReports: https://github.com/r-xla/pjrt.cuda/issues
+Depends:
+    R (>= 4.4.0)
+Encoding: UTF-8
+OS_type: unix
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.0
