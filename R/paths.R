@@ -1,28 +1,32 @@
-# Read component -> wheel_subdir mapping from the installed components.tsv
-read_components <- function() {
-  tsv <- system.file(
-    "components.tsv",
-    package = utils::packageName(),
-    mustWork = TRUE
-  )
-  df <- utils::read.delim(tsv, stringsAsFactors = FALSE)
-  stats::setNames(df$wheel_subdir, df$component)
-}
-
 the <- new.env(parent = emptyenv())
 
+# Read component -> wheel_subdir mapping from components.tsv
 component_subdir <- function(component) {
   if (is.null(the[["components"]])) {
-    the[["components"]] <- read_components()
+    df <- read_components()
+    the[["components"]] <- stats::setNames(df$wheel_subdir, df$component)
   }
   if (!component %in% names(the[["components"]])) {
     stop(sprintf(
       "Unknown component: '%s'. Available: %s",
       component,
       paste(names(the[["components"]]), collapse = ", ")
-    ))
+    ), call. = FALSE)
   }
   the[["components"]][[component]]
+}
+
+# Returns cuda_home(), erroring if the components are not installed.
+installed_home <- function() {
+  home <- cuda_home()
+  if (!cuda_installed()) {
+    stop(
+      "The CUDA components are not installed in ", home, ". ",
+      "Run `pjrt.cuda::install_cuda()` to install them.",
+      call. = FALSE
+    )
+  }
+  home
 }
 
 #' @title Path to a CUDA Component Installation
@@ -35,12 +39,13 @@ component_subdir <- function(component) {
 #'   Path to the installed component files.
 #' @export
 cuda_path <- function(component) {
-  system.file(
-    "nvidia",
-    component_subdir(component),
-    package = utils::packageName(),
-    mustWork = TRUE
-  )
+  path <- file.path(installed_home(), "nvidia", component_subdir(component))
+  if (!dir.exists(path)) {
+    stop(sprintf(
+      "Component '%s' is not installed (check PJRT_CUDA_COMPONENTS).", component
+    ), call. = FALSE)
+  }
+  path
 }
 
 #' @title Path to the Shared Library Directory
@@ -51,7 +56,7 @@ cuda_path <- function(component) {
 #'   Path to the lib directory.
 #' @export
 lib_path <- function() {
-  system.file("lib", package = utils::packageName(), mustWork = TRUE)
+  file.path(installed_home(), "lib")
 }
 
 #' @title Path to a CUDA Component's Headers

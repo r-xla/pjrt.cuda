@@ -6,16 +6,34 @@
 \alias{pjrt.cuda-package}
 \title{pjrt.cuda: CUDA Toolkit Libraries for 'pjrt'}
 \description{
-Provides the CUDA 12.8 native libraries required by the CUDA PJRT plugin used by the 'pjrt' package (CUDA runtime, cuBLAS, cuDNN, CUPTI, NVRTC, cuFFT, cuSOLVER, cuSPARSE, NvJitLink, NCCL, NVSHMEM, and NVCC) by downloading pre-built binaries from PyPI at install time. The source package is lightweight; all CUDA components are fetched during installation.
+Provides the CUDA 13.3 native libraries required by the CUDA PJRT plugin used by the 'pjrt' package (CUDA runtime, cuBLAS, cuDNN, CUPTI, NVRTC, cuFFT, cuSOLVER, cuSPARSE, NvJitLink, NCCL, and NVCC). The package itself is lightweight; the CUDA components are downloaded as NVIDIA's official redistributable binaries from PyPI into a user cache directory the first time the package is loaded.
 }
+\section{Installation of the CUDA components}{
+
+The package itself is lightweight. The CUDA components (several GB) are
+downloaded from PyPI into \code{\link[=cuda_home]{cuda_home()}} the first time the package is
+loaded, or when \code{\link[=install_cuda]{install_cuda()}} is called. Whether loading the package may
+download them is controlled by the environment variable \code{PJRT_INSTALL},
+which is shared with the \code{pjrt} package:
+\itemize{
+\item \code{PJRT_INSTALL=1}: download without asking (e.g. CI, scripts, Docker builds).
+\item \code{PJRT_INSTALL=0}: never download.
+\item unset: ask for confirmation in an interactive session, do nothing in a
+non-interactive one.
+}
+}
+
 \section{Environment Variables}{
 
 \itemize{
+\item \code{PJRT_INSTALL}: Whether loading the package may download the CUDA
+components, see above.
+\item \code{PJRT_CUDA_HOME}: Directory in which the CUDA components are installed.
+Defaults to \code{tools::R_user_dir("pjrt.cuda", "cache")}.
 \item \code{PJRT_CUDA_COMPONENTS}: Comma-separated list of components to install
-at package installation time (default: all components), e.g.
-\code{"runtime,cublas,cudnn"}. A component's pinned version can be overridden
-with \code{@}, e.g. \code{"cudnn@9.10.0.56"}. Note that the \code{pjrt} CUDA backend
-requires all components to be present.
+(default: all components), e.g. \code{"runtime,cublas,cudnn"}. A component's
+pinned version can be overridden with \code{@}, e.g. \code{"cudnn@9.10.0.56"}.
+Note that the \code{pjrt} CUDA backend requires all components to be present.
 }
 }
 
@@ -23,13 +41,13 @@ requires all components to be present.
 
 The \code{pjrt.cuda} package itself is MIT-licensed. It does not bundle NVIDIA
 software; instead it downloads NVIDIA's official redistributable binaries
-from PyPI at install time. Their use is governed by the
+from PyPI. Their use is governed by the
 \href{https://docs.nvidia.com/cuda/eula/}{NVIDIA CUDA Toolkit EULA}, with the
 exception of cuDNN, which is covered by the
 \href{https://docs.nvidia.com/deeplearning/cudnn/sla/index.html}{NVIDIA cuDNN SLA},
 and NCCL, which is covered by its
 \href{https://github.com/NVIDIA/nccl/blob/master/LICENSE.txt}{own license}.
-By installing this package you accept those terms.
+By downloading them you accept those terms.
 }
 
 \seealso{
