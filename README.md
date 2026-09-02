@@ -1,9 +1,9 @@
 # pjrt.cuda
 
 Provides the CUDA 13.3 native libraries required by the CUDA PJRT plugin used
-by the [pjrt](https://github.com/r-xla/pjrt) package. The source package is
+by the [pjrt](https://github.com/r-xla/pjrt) package. The package itself is
 lightweight — all CUDA components are downloaded as NVIDIA's official
-redistributable binaries from PyPI at install time.
+redistributable binaries from PyPI the first time the package is loaded.
 
 The component set is what `libpjrt_cuda.so` (from
 [zml/pjrt-artifacts](https://github.com/zml/pjrt-artifacts)) links against,
@@ -26,6 +26,29 @@ manually:
 install.packages("pjrt.cuda", repos = "https://r-xla.r-universe.dev")
 ```
 
+Installing the package does not download anything. The CUDA components
+(several GB) are fetched into `pjrt.cuda::cuda_home()` — by default
+`tools::R_user_dir("pjrt.cuda", "cache")`, or `PJRT_CUDA_HOME` if set — the
+first time the package is loaded:
+
+```r
+Sys.setenv(PJRT_INSTALL = "1")
+loadNamespace("pjrt.cuda")
+# or, equivalently
+pjrt.cuda::install_cuda()
+```
+
+Whether loading the package may download the components is controlled by the
+`PJRT_INSTALL` environment variable, which is shared with `pjrt`:
+
+- `PJRT_INSTALL=1`: download without asking (e.g. CI, scripts, Docker builds).
+- `PJRT_INSTALL=0`: never download.
+- unset: ask for confirmation in an interactive session, do nothing in a
+  non-interactive one.
+
+The components are re-downloaded when the pinned versions change (e.g. after
+updating the package) or the selected components change.
+
 ### Installing specific components
 
 By default, all components are installed. Set the `PJRT_CUDA_COMPONENTS`
@@ -34,7 +57,7 @@ component's pinned version with `@`:
 
 ```r
 Sys.setenv(PJRT_CUDA_COMPONENTS = "runtime,cublas,cudnn@9.10.0.56")
-install.packages("pjrt.cuda", repos = "https://r-xla.r-universe.dev")
+pjrt.cuda::install_cuda()
 ```
 
 Note that the `pjrt` CUDA backend requires all components.
@@ -42,6 +65,9 @@ Note that the `pjrt` CUDA backend requires all components.
 ## Usage
 
 ```r
+# Installation root of all components
+pjrt.cuda::cuda_home()
+
 # Directory containing all shared libraries (*.so)
 pjrt.cuda::lib_path()
 

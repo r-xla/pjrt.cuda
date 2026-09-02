@@ -1,2 +1,0 @@
-#!/bin/sh
-rm -rf inst/lib inst/nvidia
