@@ -6,7 +6,7 @@
 \alias{pjrt.cuda-package}
 \title{pjrt.cuda: CUDA Toolkit Libraries for 'pjrt'}
 \description{
-Provides the CUDA 13.3 native libraries required by the CUDA PJRT plugin used by the 'pjrt' package (CUDA runtime, cuBLAS, cuDNN, CUPTI, NVRTC, cuFFT, cuSOLVER, cuSPARSE, NvJitLink, NCCL, and NVCC). The package itself is lightweight; the CUDA components are downloaded as NVIDIA's official redistributable binaries from PyPI into a user cache directory the first time the package is loaded.
+Provides the CUDA 13.3 native libraries required by the CUDA PJRT plugin used by the 'pjrt' package (CUDA runtime, cuBLAS, cuDNN, CUPTI, NVRTC, cuFFT, cuSOLVER, cuSPARSE, NvJitLink, NCCL, and NVCC). The package itself is lightweight; the CUDA components are downloaded as NVIDIA's official redistributable binaries from PyPI into the package's installation directory (or a user cache directory when that is not writable) the first time the package is loaded.
 }
 \section{Installation of the CUDA components}{
 
@@ -29,7 +29,9 @@ non-interactive one.
 \item \code{PJRT_INSTALL}: Whether loading the package may download the CUDA
 components, see above.
 \item \code{PJRT_CUDA_HOME}: Directory in which the CUDA components are installed.
-Defaults to \code{tools::R_user_dir("pjrt.cuda", "cache")}.
+Defaults to the installation directory of the package, or
+\code{tools::R_user_dir("pjrt.cuda", "cache")} when that is not writable, see
+\code{\link[=cuda_home]{cuda_home()}}.
 \item \code{PJRT_CUDA_COMPONENTS}: Comma-separated list of components to install
 (default: all components), e.g. \code{"runtime,cublas,cudnn"}. A component's
 pinned version can be overridden with \code{@}, e.g. \code{"cudnn@9.10.0.56"}.

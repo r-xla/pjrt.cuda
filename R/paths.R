@@ -19,7 +19,7 @@ component_subdir <- function(component) {
 # Returns cuda_home(), erroring if the components are not installed.
 installed_home <- function() {
   home <- cuda_home()
-  if (!cuda_installed()) {
+  if (!installed_in(home)) {
     stop(
       "The CUDA components are not installed in ", home, ". ",
       "Run `pjrt.cuda::install_cuda()` to install them.",
