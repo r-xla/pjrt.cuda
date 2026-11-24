@@ -23,6 +23,8 @@ Depends:
 Imports:
     tools,
     utils
+Suggests:
+    pkgload
 Encoding: UTF-8
 OS_type: unix
 Roxygen: list(markdown = TRUE)

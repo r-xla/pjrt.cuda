@@ -44,12 +44,15 @@ cuda_homes <- function() {
   )
 }
 
-# The directory of the installed package, or NULL when it is loaded from source
-# (e.g. with pkgload), so that the components are not downloaded into the
+# The directory of the installed package, or NULL when it is loaded with
+# pkgload::load_all(), so that the components are not downloaded into the
 # source tree.
 installed_package_dir <- function() {
-  dir <- system.file(package = utils::packageName())
-  if (file.exists(file.path(dir, "Meta", "package.rds"))) dir else NULL
+  pkg <- utils::packageName()
+  if (isNamespaceLoaded("pkgload") && pkgload::is_dev_package(pkg)) {
+    return(NULL)
+  }
+  system.file(package = pkg)
 }
 
 # Whether `path` can be created or replaced: whether its closest existing
