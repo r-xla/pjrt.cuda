@@ -13,7 +13,9 @@
 #' * `PJRT_INSTALL`: Whether loading the package may download the CUDA
 #'   components, see above.
 #' * `PJRT_CUDA_HOME`: Directory in which the CUDA components are installed.
-#'   Defaults to `tools::R_user_dir("pjrt.cuda", "cache")`.
+#'   Defaults to the installation directory of the package, or
+#'   `tools::R_user_dir("pjrt.cuda", "cache")` when that is not writable, see
+#'   [cuda_home()].
 #' * `PJRT_CUDA_COMPONENTS`: Comma-separated list of components to install
 #'   (default: all components), e.g. `"runtime,cublas,cudnn"`. A component's
 #'   pinned version can be overridden with `@`, e.g. `"cudnn@9.10.0.56"`.

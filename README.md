@@ -27,9 +27,10 @@ install.packages("pjrt.cuda", repos = "https://r-xla.r-universe.dev")
 ```
 
 Installing the package does not download anything. The CUDA components
-(several GB) are fetched into `pjrt.cuda::cuda_home()` — by default
-`tools::R_user_dir("pjrt.cuda", "cache")`, or `PJRT_CUDA_HOME` if set — the
-first time the package is loaded:
+(several GB) are fetched into `pjrt.cuda::cuda_home()` — by default the
+package's installation directory, so that all users of its library share them,
+or `tools::R_user_dir("pjrt.cuda", "cache")` when that is not writable, or
+`PJRT_CUDA_HOME` if set — the first time the package is loaded:
 
 ```r
 Sys.setenv(PJRT_INSTALL = "1")
@@ -46,8 +47,9 @@ Whether loading the package may download the components is controlled by the
 - unset: ask for confirmation in an interactive session, do nothing in a
   non-interactive one.
 
-The components are re-downloaded when the pinned versions change (e.g. after
-updating the package) or the selected components change.
+The components are re-downloaded when the pinned versions or the selected
+components change, and when stored in the package's installation directory,
+after reinstalling the package.
 
 ### Installing specific components
 

@@ -14,8 +14,13 @@ PATCHELF_URLS <- c(
 #' @title Installation Directory of the CUDA Components
 #' @description
 #' Returns the directory into which the CUDA components are downloaded.
-#' This is `tools::R_user_dir("pjrt.cuda", "cache")` unless the environment
-#' variable `PJRT_CUDA_HOME` is set.
+#'
+#' This is the environment variable `PJRT_CUDA_HOME` if it is set. Otherwise,
+#' the components are stored in the `cuda` directory of the installed package,
+#' so that all users of its library share them, and reinstalling the package
+#' removes them. When that directory is not writable, they are stored in
+#' `tools::R_user_dir("pjrt.cuda", "cache")` instead. Components already
+#' installed in either directory are used from there.
 #' @return (`character(1)`)\cr
 #'   Path to the installation directory (which may not exist yet).
 #' @export
@@ -24,7 +29,39 @@ cuda_home <- function() {
   if (nzchar(home)) {
     return(normalizePath(home, mustWork = FALSE))
   }
-  tools::R_user_dir("pjrt.cuda", which = "cache")
+  homes <- cuda_homes()
+  Find(installed_in, homes) %||% Find(dir_writable, homes) %||% homes[[length(homes)]]
+}
+
+# The directories the CUDA components are stored in, in order of preference:
+# the `cuda` directory of the installed package, which all users of its library
+# share, then the user cache.
+cuda_homes <- function() {
+  pkg_dir <- installed_package_dir()
+  c(
+    if (!is.null(pkg_dir)) file.path(pkg_dir, "cuda"),
+    tools::R_user_dir("pjrt.cuda", which = "cache")
+  )
+}
+
+# The directory of the installed package, or NULL when it is loaded with
+# pkgload::load_all(), so that the components are not downloaded into the
+# source tree.
+installed_package_dir <- function() {
+  pkg <- utils::packageName()
+  if (isNamespaceLoaded("pkgload") && pkgload::is_dev_package(pkg)) {
+    return(NULL)
+  }
+  system.file(package = pkg)
+}
+
+# Whether `path` can be created or replaced: whether its closest existing
+# ancestor is writable.
+dir_writable <- function(path) {
+  while (!dir.exists(path)) {
+    path <- dirname(path)
+  }
+  file.access(path, 2L) == 0L
 }
 
 #' @title Are the CUDA Components Installed?
@@ -35,7 +72,12 @@ cuda_home <- function() {
 #' @return (`logical(1)`)
 #' @export
 cuda_installed <- function() {
-  marker <- installed_marker_path()
+  installed_in(cuda_home())
+}
+
+# Whether the selected components are installed in `home`.
+installed_in <- function(home) {
+  marker <- installed_marker_path(home)
   if (!file.exists(marker)) {
     return(FALSE)
   }
@@ -67,7 +109,7 @@ install_cuda <- function(reinstall = FALSE) {
   home <- cuda_home()
   components <- selected_components()
 
-  if (!reinstall && cuda_installed()) {
+  if (!reinstall && installed_in(home)) {
     message("CUDA components are already installed in ", home, ".")
     return(invisible(home))
   }
@@ -79,7 +121,7 @@ install_cuda <- function(reinstall = FALSE) {
 
   # Only remove what we manage; PJRT_CUDA_HOME may point somewhere the user
   # keeps other things.
-  unlink(c(installed_marker_path(), file.path(home, c("lib", "nvidia"))), recursive = TRUE)
+  unlink(c(installed_marker_path(home), file.path(home, c("lib", "nvidia"))), recursive = TRUE)
   lib_dir <- file.path(home, "lib")
   dir.create(lib_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -96,15 +138,15 @@ install_cuda <- function(reinstall = FALSE) {
 
   patch_rpath(lib_dir, arch, tmpdir)
 
-  write_tsv(components, installed_marker_path())
+  write_tsv(components, installed_marker_path(home))
   message("=== All components installed successfully ===")
   invisible(home)
 }
 
 # ---- components.tsv ---------------------------------------------------------
 
-installed_marker_path <- function() {
-  file.path(cuda_home(), "components.tsv")
+installed_marker_path <- function(home) {
+  file.path(home, "components.tsv")
 }
 
 read_tsv <- function(path) {

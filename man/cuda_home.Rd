@@ -12,6 +12,11 @@ Path to the installation directory (which may not exist yet).
 }
 \description{
 Returns the directory into which the CUDA components are downloaded.
-This is \code{tools::R_user_dir("pjrt.cuda", "cache")} unless the environment
-variable \code{PJRT_CUDA_HOME} is set.
+
+This is the environment variable \code{PJRT_CUDA_HOME} if it is set. Otherwise,
+the components are stored in the \code{cuda} directory of the installed package,
+so that all users of its library share them, and reinstalling the package
+removes them. When that directory is not writable, they are stored in
+\code{tools::R_user_dir("pjrt.cuda", "cache")} instead. Components already
+installed in either directory are used from there.
 }
