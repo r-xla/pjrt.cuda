@@ -9,10 +9,11 @@ The component set is what `libpjrt_cuda.so` (from
 [zml/pjrt-artifacts](https://github.com/zml/pjrt-artifacts)) links against,
 plus what pjrt itself needs at runtime: `nvcc` (for `ptxas`) and `nvvm` (for
 `libdevice`), which XLA uses to compile PTX, and `cusolver`, which pjrt's
-linalg custom calls dlopen:
+linalg custom calls dlopen. With `crt`, the headers `nvcc` compiles CUDA code
+with, the same tree also builds the kernels of a package's own custom calls:
 
 runtime, cublas, cupti, nvrtc, cufft, cusolver, cusparse, nvjitlink, nvcc,
-nvvm, cudnn, nccl
+crt, nvvm, cudnn, nccl
 
 Adapted from [mlverse/cudatoolkit](https://github.com/mlverse/cudatoolkit).
 
