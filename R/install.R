@@ -330,11 +330,11 @@ install_component <- function(spec, arch, home, tmpdir) {
     unlink(wheel_lib, recursive = TRUE)
   }
 
-  # Ensure binaries are executable (for nvcc/ptxas)
-  if ("bin" %in% dirs) {
-    bins <- list.files(file.path(component_dir, "bin"), full.names = TRUE, recursive = TRUE)
-    Sys.chmod(bins, "0755")
-  }
+  # Make the binaries executable again, which unzip() does not keep: nvcc and
+  # ptxas in bin/, and cicc in nvvm/bin/, which nvcc runs to compile a kernel.
+  bin_dirs <- file.path(component_dir, ifelse(dirs == "bin", "bin", file.path(dirs, "bin")))
+  bins <- list.files(bin_dirs[dir.exists(bin_dirs)], full.names = TRUE, recursive = TRUE)
+  Sys.chmod(bins, "0755")
 
   message("  Done.")
 }

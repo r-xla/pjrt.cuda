@@ -8,6 +8,7 @@ cusolver	nvidia_cusolver	12.2.6.9	cu13	lib,include
 cusparse	nvidia_cusparse	12.8.2.51	cu13	lib,include
 nvjitlink	nvidia_nvjitlink	13.3.33	cu13	lib,include
 nvcc	nvidia_cuda_nvcc	13.3.73	cu13	bin,include
+crt	nvidia_cuda_crt	13.3.73	cu13	include
 nvvm	nvidia_nvvm	13.3.73	cu13	lib,nvvm
 cudnn	nvidia_cudnn_cu13	9.25.1.1	cudnn	lib,include
 nccl	nvidia_nccl_cu13	2.31.2	nccl	lib,include
